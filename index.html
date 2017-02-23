@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Rocket form - all the rockets to the space with one form.</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </head>
+    <body>
+    
+    <form action="/service.php?a=register" method="POST" data-rf>
+        <input type="text" name="name" value="">
+    </form>
+    
+    <script src="src/rocket-form.js"></script>
+    <script>
+        // Imagin this is the app.js file for the project and src/rocket-form.js is a library.
+        var rf = RocketForm.init();
+    </script>
+    </body>
+</html>
