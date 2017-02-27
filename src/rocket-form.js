@@ -1,20 +1,31 @@
 var rocketForm = rocketForm || {};
 
-rocketForm.FormModel = (function (rocketForm) {
-    var action,
-        method;
+// ****************************** MODELS ************************************ //
 
-    function init(opts) {
-        action: opts.action || '';
-        method: opts.method || 'POST';
+rocketForm.FormModel = (function (rocketForm) {
+    var expose = {};
+
+    /**
+     * init()
+     * Sets the forms properties.
+     * 
+     * @param {any} opts 
+     * @returns 
+     */
+    expose.init = function init(opts) {
+        expose.method = opts.method || 'POST';
+        expose.action = opts.action || '';
+        expose.name = opts.name || '';
+        expose.id = opts.id || '';
+        expose.el = opts.el || null;
 
         return this;
     }
     
-    return {
-        init: init
-    }
+    return expose;
 }(rocketForm));
+
+// ***************************** SERVICES *********************************** //
 
 rocketForm.FormsRepository = (function(rocketForm) {
     function all() {
@@ -26,21 +37,41 @@ rocketForm.FormsRepository = (function(rocketForm) {
     };
 }(rocketForm));
 
+// ****************************** ENGINE ************************************ //
 
 rocketForm.Engine = (function (rocketForm) {
-    var config = {};
-
+    var forms = $([]);
+    
     function init(opts) {
-        rocketForm.Bootstrapper.bootstrap(config, opts);
-        config = rocketForm.config;
+        rocketForm.Bootstrapper.bootstrap(opts || {});
 
         loadForms();
+        runEngine();
 
         return this;
     }
     
     function loadForms() {
-        console.log(config.services.formsRepository.all());
+        return forms = rocketForm.services.formsRepository.all();
+    }
+    
+    function runEngine() {
+        forms.each(function (index) {
+            var formEl = $(this)
+                method = formEl.attr('method'),
+                action = formEl.attr('action'),
+                name = formEl.attr('name'),
+                id = formEl.attr('id'),
+                form = rocketForm.FormModel.init({
+                    method: method,
+                    action: action,
+                    name: name,
+                    id: id,
+                    el: formEl
+                });
+
+            console.log(form);
+        });
     }
     
     return {
@@ -48,19 +79,34 @@ rocketForm.Engine = (function (rocketForm) {
     };
 }(rocketForm));
 
-rocketForm.Bootstrapper = (function (rocketForm) {
-    function bootstrap(config, opts) {
-        var defaultConfig = {};
+// *************************** BOOTSTRAPPER ******************************** //
 
-        defaultConfig.selectors = {
-            rocketForm: '[data-rf]'
+rocketForm.Bootstrapper = (function (rocketForm) {
+    function bootstrap(opts) {
+        bootstrapConfig(opts);
+        bootstrapServices(opts);
+    }
+
+    function bootstrapConfig(opts) {
+        opts.config = opts.config || {};
+
+        var defaultConfig = {
+            selectors: {
+                rocketForm: '[data-rf]'
+            }
         }
 
-        defaultConfig.services = {
+        return rocketForm.config = $.extend({}, defaultConfig, opts.config);
+    }
+
+    function bootstrapServices(opts) {
+        opts.services = opts.services || {};
+
+        var defaultServices = {
             formsRepository: rocketForm.FormsRepository
         }
 
-        return rocketForm.config = $.extend({}, defaultConfig, opts);
+        return rocketForm.services = $.extend({}, defaultServices, opts.services);
     }
 
     return {
